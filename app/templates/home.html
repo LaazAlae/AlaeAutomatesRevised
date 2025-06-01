@@ -1,0 +1,120 @@
+{% extends "base.html" %}
+
+{% block title %}Automate - Business Process Automation Tools{% endblock %}
+
+{% block content %}
+<div class="px-4">
+    <!-- Hero Section -->
+    <div class="text-center py-12">
+        <h1 class="text-5xl font-bold text-blue-500 mb-4">Business Process Automation</h1>
+        <p class="text-xl text-gray-300 max-w-3xl mx-auto">
+            Streamline your workflow with our suite of automation tools designed to save time and reduce manual errors.
+        </p>
+    </div>
+
+    <!-- Tools Grid -->
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 gap-8 mt-12 max-w-6xl mx-auto">
+        <!-- Invoice Processor -->
+        <div class="bg-gray-800 rounded-lg shadow-xl p-8 hover:bg-gray-700 transition duration-300">
+            <div class="flex items-center mb-6">
+                <i class="fas fa-file-invoice text-blue-500 text-4xl mr-4"></i>
+                <h2 class="text-2xl font-bold">Invoice Processor</h2>
+            </div>
+            <p class="text-gray-300 mb-6">
+                Automatically extract and split invoices from PDF files. Uses pattern recognition to identify invoice numbers and creates individual PDF files for each invoice.
+            </p>
+            <ul class="text-gray-400 mb-6 space-y-2">
+                <li><i class="fas fa-check text-green-500 mr-2"></i>Extracts P and R invoice numbers</li>
+                <li><i class="fas fa-check text-green-500 mr-2"></i>Splits multi-page PDFs</li>
+                <li><i class="fas fa-check text-green-500 mr-2"></i>Automatic file naming</li>
+                <li><i class="fas fa-check text-green-500 mr-2"></i>Bulk download as ZIP</li>
+            </ul>
+            <a href="{{ url_for('invoice_processor.index') }}" class="inline-block bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-6 rounded-lg transition duration-300">
+                <i class="fas fa-rocket mr-2"></i>Launch Tool
+            </a>
+        </div>
+
+        <!-- Statement Separator -->
+        <div class="bg-gray-800 rounded-lg shadow-xl p-8 hover:bg-gray-700 transition duration-300">
+            <div class="flex items-center mb-6">
+                <i class="fas fa-file-alt text-green-500 text-4xl mr-4"></i>
+                <h2 class="text-2xl font-bold">Statement Separator</h2>
+            </div>
+            <p class="text-gray-300 mb-6">
+                Intelligently categorize and separate statements based on company names and locations. Match against Excel database with smart fuzzy matching.
+            </p>
+            <ul class="text-gray-400 mb-6 space-y-2">
+                <li><i class="fas fa-check text-green-500 mr-2"></i>DNM company matching</li>
+                <li><i class="fas fa-check text-green-500 mr-2"></i>National/Foreign categorization</li>
+                <li><i class="fas fa-check text-green-500 mr-2"></i>Manual review for edge cases</li>
+                <li><i class="fas fa-check text-green-500 mr-2"></i>Separate PDF outputs</li>
+            </ul>
+            <a href="{{ url_for('statement_separator.index') }}" class="inline-block bg-green-600 hover:bg-green-700 text-white font-bold py-3 px-6 rounded-lg transition duration-300">
+                <i class="fas fa-rocket mr-2"></i>Launch Tool
+            </a>
+        </div>
+
+        <!-- Excel Macros -->
+        <div class="bg-gray-800 rounded-lg shadow-xl p-8 hover:bg-gray-700 transition duration-300">
+            <div class="flex items-center mb-6">
+                <i class="fas fa-file-excel text-purple-500 text-4xl mr-4"></i>
+                <h2 class="text-2xl font-bold">Excel Macros</h2>
+            </div>
+            <p class="text-gray-300 mb-6">
+                Ready-to-use VBA macros for common Excel tasks. Copy and paste into Excel's VBA editor to automate repetitive formatting and calculations.
+            </p>
+            <ul class="text-gray-400 mb-6 space-y-2">
+                <li><i class="fas fa-check text-green-500 mr-2"></i>Credit card batch formatting</li>
+                <li><i class="fas fa-check text-green-500 mr-2"></i>Name standardization</li>
+                <li><i class="fas fa-check text-green-500 mr-2"></i>Category summations</li>
+                <li><i class="fas fa-check text-green-500 mr-2"></i>One-click execution</li>
+            </ul>
+            <a href="{{ url_for('excel_macros.index') }}" class="inline-block bg-purple-600 hover:bg-purple-700 text-white font-bold py-3 px-6 rounded-lg transition duration-300">
+                <i class="fas fa-rocket mr-2"></i>Launch Tool
+            </a>
+        </div>
+
+        <!-- CC Batch Demo -->
+        <div class="bg-gray-800 rounded-lg shadow-xl p-8 hover:bg-gray-700 transition duration-300">
+            <div class="flex items-center mb-6">
+                <i class="fas fa-credit-card text-orange-500 text-4xl mr-4"></i>
+                <h2 class="text-2xl font-bold">CC Batch Demo</h2>
+            </div>
+            <p class="text-gray-300 mb-6">
+                Automated web form filling demonstration. Upload Excel data and watch as it automatically populates web forms using browser automation.
+            </p>
+            <ul class="text-gray-400 mb-6 space-y-2">
+                <li><i class="fas fa-check text-green-500 mr-2"></i>Excel data extraction</li>
+                <li><i class="fas fa-check text-green-500 mr-2"></i>Automated form filling</li>
+                <li><i class="fas fa-check text-green-500 mr-2"></i>Browser automation demo</li>
+                <li><i class="fas fa-check text-green-500 mr-2"></i>Live browser session</li>
+            </ul>
+            <a href="{{ url_for('cc_batch_demo.index') }}" class="inline-block bg-orange-600 hover:bg-orange-700 text-white font-bold py-3 px-6 rounded-lg transition duration-300">
+                <i class="fas fa-rocket mr-2"></i>Launch Tool
+            </a>
+        </div>
+    </div>
+
+    <!-- Features Section -->
+    <div class="mt-20 py-12 bg-gray-800 rounded-lg max-w-6xl mx-auto">
+        <h2 class="text-3xl font-bold text-center mb-8">Why Choose Our Tools?</h2>
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-8 px-8">
+            <div class="text-center">
+                <i class="fas fa-tachometer-alt text-blue-500 text-4xl mb-4"></i>
+                <h3 class="text-xl font-bold mb-2">Fast Processing</h3>
+                <p class="text-gray-400">Process hundreds of documents in seconds, not hours</p>
+            </div>
+            <div class="text-center">
+                <i class="fas fa-shield-alt text-green-500 text-4xl mb-4"></i>
+                <h3 class="text-xl font-bold mb-2">Secure & Private</h3>
+                <p class="text-gray-400">All processing happens locally, your data stays safe</p>
+            </div>
+            <div class="text-center">
+                <i class="fas fa-cogs text-purple-500 text-4xl mb-4"></i>
+                <h3 class="text-xl font-bold mb-2">Easy to Use</h3>
+                <p class="text-gray-400">Simple interface designed for efficiency</p>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

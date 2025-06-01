@@ -1,0 +1,306 @@
+{% extends "base.html" %}
+
+{% block title %}Invoice Processor - Automate{% endblock %}
+
+{% block content %}
+<div class="max-w-4xl mx-auto px-4">
+    <!-- Header -->
+    <div class="mb-8">
+        <div class="flex items-center mb-4">
+            <a href="{{ url_for('main.home') }}" class="text-gray-400 hover:text-white mr-4">
+                <i class="fas fa-arrow-left"></i> Back
+            </a>
+            <h1 class="text-3xl font-bold flex items-center">
+                <i class="fas fa-file-invoice text-blue-500 mr-3"></i>
+                Invoice Processor
+            </h1>
+        </div>
+        <p class="text-gray-300">Extract and split invoices from PDF files automatically</p>
+    </div>
+
+    <!-- Upload Section -->
+    <div class="bg-gray-800 rounded-lg shadow-xl p-8 mb-8">
+        <div class="mb-6">
+            <h2 class="text-xl font-bold mb-4">Upload PDF File</h2>
+            <p class="text-gray-400 mb-4">Select a PDF containing multiple invoices. The system will identify invoice numbers (P/R followed by 6-8 digits) and create separate PDFs.</p>
+        </div>
+
+        <!-- Upload Form -->
+        <form id="uploadForm" enctype="multipart/form-data">
+            <div class="border-2 border-dashed border-gray-600 rounded-lg p-8 text-center hover:border-blue-500 transition duration-300">
+                <input type="file" id="fileInput" name="file" accept=".pdf" class="hidden">
+                <i class="fas fa-cloud-upload-alt text-6xl text-gray-500 mb-4"></i>
+                <p class="text-lg mb-2">Drag and drop your PDF here</p>
+                <p class="text-gray-400 mb-4">or</p>
+                <button type="button" id="browseBtn" class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-6 rounded-lg transition duration-300">
+                    Browse Files
+                </button>
+                <p class="text-sm text-gray-500 mt-4">Maximum file size: 16MB</p>
+            </div>
+            
+            <!-- File Info -->
+            <div id="fileInfo" class="hidden mt-4 p-4 bg-gray-700 rounded-lg">
+                <div class="flex items-center justify-between">
+                    <div class="flex items-center">
+                        <i class="fas fa-file-pdf text-red-500 text-2xl mr-3"></i>
+                        <div>
+                            <p class="font-bold" id="fileName"></p>
+                            <p class="text-sm text-gray-400" id="fileSize"></p>
+                        </div>
+                    </div>
+                    <button type="button" id="removeFile" class="text-red-500 hover:text-red-400">
+                        <i class="fas fa-times"></i>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Process Button -->
+            <button type="submit" id="processBtn" class="hidden w-full mt-6 bg-green-600 hover:bg-green-700 text-white font-bold py-3 px-6 rounded-lg transition duration-300">
+                <i class="fas fa-play mr-2"></i>Process PDF
+            </button>
+        </form>
+
+        <!-- Progress -->
+        <div id="progress" class="hidden mt-6">
+            <div class="flex items-center">
+                <div class="spinner mr-3"></div>
+                <p class="text-gray-300">Processing PDF...</p>
+            </div>
+            <div class="w-full bg-gray-700 rounded-full h-2 mt-2">
+                <div id="progressBar" class="bg-blue-600 h-2 rounded-full transition-all duration-500" style="width: 0%"></div>
+            </div>
+        </div>
+
+        <!-- Results -->
+        <div id="results" class="hidden mt-6 p-4 bg-gray-700 rounded-lg">
+            <div class="flex items-center justify-between mb-4">
+                <div>
+                    <p class="text-green-500 font-bold text-lg">
+                        <i class="fas fa-check-circle mr-2"></i>Processing Complete!
+                    </p>
+                    <p class="text-gray-300" id="resultMessage"></p>
+                </div>
+            </div>
+            <a href="#" id="downloadBtn" class="inline-block bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-6 rounded-lg transition duration-300">
+                <i class="fas fa-download mr-2"></i>Download ZIP
+            </a>
+            <button type="button" id="processAnother" class="inline-block ml-2 bg-gray-600 hover:bg-gray-500 text-white font-bold py-2 px-6 rounded-lg transition duration-300">
+                Process Another
+            </button>
+        </div>
+    </div>
+
+    <!-- Instructions -->
+    <div class="bg-gray-800 rounded-lg shadow-xl p-8">
+        <h3 class="text-xl font-bold mb-4">How It Works</h3>
+        <div class="space-y-4">
+            <div class="flex items-start">
+                <div class="bg-blue-600 rounded-full w-8 h-8 flex items-center justify-center mr-4 flex-shrink-0">
+                    <span class="text-sm font-bold">1</span>
+                </div>
+                <div>
+                    <h4 class="font-bold mb-1">Upload PDF</h4>
+                    <p class="text-gray-400">Select a PDF file containing multiple invoices</p>
+                </div>
+            </div>
+            <div class="flex items-start">
+                <div class="bg-blue-600 rounded-full w-8 h-8 flex items-center justify-center mr-4 flex-shrink-0">
+                    <span class="text-sm font-bold">2</span>
+                </div>
+                <div>
+                    <h4 class="font-bold mb-1">Automatic Detection</h4>
+                    <p class="text-gray-400">System identifies invoice numbers (P or R followed by 6-8 digits)</p>
+                </div>
+            </div>
+            <div class="flex items-start">
+                <div class="bg-blue-600 rounded-full w-8 h-8 flex items-center justify-center mr-4 flex-shrink-0">
+                    <span class="text-sm font-bold">3</span>
+                </div>
+                <div>
+                    <h4 class="font-bold mb-1">Split & Package</h4>
+                    <p class="text-gray-400">Creates individual PDFs named by invoice number</p>
+                </div>
+            </div>
+            <div class="flex items-start">
+                <div class="bg-blue-600 rounded-full w-8 h-8 flex items-center justify-center mr-4 flex-shrink-0">
+                    <span class="text-sm font-bold">4</span>
+                </div>
+                <div>
+                    <h4 class="font-bold mb-1">Download</h4>
+                    <p class="text-gray-400">All invoices packaged in a convenient ZIP file</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const form = document.getElementById('uploadForm');
+    const fileInput = document.getElementById('fileInput');
+    const browseBtn = document.getElementById('browseBtn');
+    const fileInfo = document.getElementById('fileInfo');
+    const fileName = document.getElementById('fileName');
+    const fileSize = document.getElementById('fileSize');
+    const removeFile = document.getElementById('removeFile');
+    const processBtn = document.getElementById('processBtn');
+    const progress = document.getElementById('progress');
+    const progressBar = document.getElementById('progressBar');
+    const results = document.getElementById('results');
+    const resultMessage = document.getElementById('resultMessage');
+    const downloadBtn = document.getElementById('downloadBtn');
+    const processAnother = document.getElementById('processAnother');
+    const dropZone = form.querySelector('.border-dashed');
+
+    // Browse button click
+    browseBtn.addEventListener('click', () => fileInput.click());
+
+    // Drag and drop
+    ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(eventName => {
+        dropZone.addEventListener(eventName, preventDefaults, false);
+    });
+
+    function preventDefaults(e) {
+        e.preventDefault();
+        e.stopPropagation();
+    }
+
+    ['dragenter', 'dragover'].forEach(eventName => {
+        dropZone.addEventListener(eventName, highlight, false);
+    });
+
+    ['dragleave', 'drop'].forEach(eventName => {
+        dropZone.addEventListener(eventName, unhighlight, false);
+    });
+
+    function highlight(e) {
+        dropZone.classList.add('border-blue-500', 'bg-gray-700');
+    }
+
+    function unhighlight(e) {
+        dropZone.classList.remove('border-blue-500', 'bg-gray-700');
+    }
+
+    dropZone.addEventListener('drop', handleDrop, false);
+
+    function handleDrop(e) {
+        const dt = e.dataTransfer;
+        const files = dt.files;
+        if (files.length) {
+            fileInput.files = files;
+            handleFiles();
+        }
+    }
+
+    // File selection
+    fileInput.addEventListener('change', handleFiles);
+
+    function handleFiles() {
+        const file = fileInput.files[0];
+        if (file) {
+            fileName.textContent = file.name;
+            fileSize.textContent = formatFileSize(file.size);
+            fileInfo.classList.remove('hidden');
+            processBtn.classList.remove('hidden');
+            dropZone.classList.add('hidden');
+        }
+    }
+
+    function formatFileSize(bytes) {
+        if (bytes === 0) return '0 Bytes';
+        const k = 1024;
+        const sizes = ['Bytes', 'KB', 'MB', 'GB'];
+        const i = Math.floor(Math.log(bytes) / Math.log(k));
+        return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
+    }
+
+    // Remove file
+    removeFile.addEventListener('click', () => {
+        fileInput.value = '';
+        fileInfo.classList.add('hidden');
+        processBtn.classList.add('hidden');
+        dropZone.classList.remove('hidden');
+        results.classList.add('hidden');
+    });
+
+    // Form submission
+    form.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        
+        const formData = new FormData();
+        formData.append('file', fileInput.files[0]);
+
+        processBtn.disabled = true;
+        progress.classList.remove('hidden');
+        results.classList.add('hidden');
+
+        // Simulate progress
+        let progressValue = 0;
+        const progressInterval = setInterval(() => {
+            progressValue += 10;
+            progressBar.style.width = progressValue + '%';
+            if (progressValue >= 90) {
+                clearInterval(progressInterval);
+            }
+        }, 200);
+
+        try {
+            const response = await fetch('/invoice/upload', {
+                method: 'POST',
+                body: formData
+            });
+
+            const data = await response.json();
+            
+            clearInterval(progressInterval);
+            progressBar.style.width = '100%';
+
+            setTimeout(() => {
+                progress.classList.add('hidden');
+                
+                if (data.status === 'success') {
+                    resultMessage.textContent = data.message;
+                    downloadBtn.href = data.download_url;
+                    results.classList.remove('hidden');
+                } else {
+                    showError(data.message);
+                }
+                
+                processBtn.disabled = false;
+            }, 500);
+        } catch (error) {
+            clearInterval(progressInterval);
+            progress.classList.add('hidden');
+            showError('An error occurred while processing the file.');
+            processBtn.disabled = false;
+        }
+    });
+
+    // Process another
+    processAnother.addEventListener('click', () => {
+        fileInput.value = '';
+        fileInfo.classList.add('hidden');
+        processBtn.classList.add('hidden');
+        dropZone.classList.remove('hidden');
+        results.classList.add('hidden');
+        progressBar.style.width = '0%';
+    });
+
+    function showError(message) {
+        const errorDiv = document.createElement('div');
+        errorDiv.className = 'mt-4 p-4 bg-red-500 bg-opacity-20 border border-red-500 rounded-lg';
+        errorDiv.innerHTML = `
+            <p class="text-red-500 font-bold">
+                <i class="fas fa-exclamation-circle mr-2"></i>Error
+            </p>
+            <p class="text-gray-300">${message}</p>
+        `;
+        form.appendChild(errorDiv);
+        
+        setTimeout(() => errorDiv.remove(), 5000);
+    }
+});
+</script>
+{% endblock %}

@@ -1,0 +1,328 @@
+{% extends "base.html" %}
+
+{% block title %}Statement Separator - Automate{% endblock %}
+
+{% block content %}
+<div class="max-w-5xl mx-auto px-4">
+    <!-- Header -->
+    <div class="mb-8">
+        <div class="flex items-center mb-4">
+            <a href="{{ url_for('main.home') }}" class="text-gray-400 hover:text-white mr-4">
+                <i class="fas fa-arrow-left"></i> Back
+            </a>
+            <h1 class="text-3xl font-bold flex items-center">
+                <i class="fas fa-file-alt text-green-500 mr-3"></i>
+                Statement Separator
+            </h1>
+        </div>
+        <p class="text-gray-300">Categorize statements by matching company names and locations</p>
+    </div>
+
+    <!-- Upload Section -->
+    <div id="uploadSection">
+        <div class="bg-gray-800 rounded-lg shadow-xl p-8 mb-8">
+            <h2 class="text-xl font-bold mb-6">Upload Files</h2>
+            
+            <form id="uploadForm" enctype="multipart/form-data">
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <!-- PDF Upload -->
+                    <div>
+                        <label class="block text-sm font-medium mb-2">Statement PDF</label>
+                        <div class="border-2 border-dashed border-gray-600 rounded-lg p-6 text-center hover:border-green-500 transition duration-300" id="pdfDropZone">
+                            <input type="file" id="pdfInput" name="pdf_file" accept=".pdf" class="hidden">
+                            <i class="fas fa-file-pdf text-5xl text-red-500 mb-3"></i>
+                            <p class="text-sm mb-2">Drop PDF here or click to browse</p>
+                            <div id="pdfInfo" class="hidden mt-3 p-3 bg-gray-700 rounded">
+                                <p class="text-sm font-bold" id="pdfName"></p>
+                                <p class="text-xs text-gray-400" id="pdfSize"></p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Excel Upload -->
+                    <div>
+                        <label class="block text-sm font-medium mb-2">Company Names Excel</label>
+                        <div class="border-2 border-dashed border-gray-600 rounded-lg p-6 text-center hover:border-green-500 transition duration-300" id="excelDropZone">
+                            <input type="file" id="excelInput" name="excel_file" accept=".xlsx,.xls" class="hidden">
+                            <i class="fas fa-file-excel text-5xl text-green-600 mb-3"></i>
+                            <p class="text-sm mb-2">Drop Excel here or click to browse</p>
+                            <div id="excelInfo" class="hidden mt-3 p-3 bg-gray-700 rounded">
+                                <p class="text-sm font-bold" id="excelName"></p>
+                                <p class="text-xs text-gray-400" id="excelSize"></p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Process Button -->
+                <button type="submit" id="processBtn" class="hidden w-full mt-6 bg-green-600 hover:bg-green-700 text-white font-bold py-3 px-6 rounded-lg transition duration-300">
+                    <i class="fas fa-play mr-2"></i>Process Files
+                </button>
+            </form>
+
+            <!-- Progress -->
+            <div id="progress" class="hidden mt-6">
+                <div class="flex items-center">
+                    <div class="spinner mr-3"></div>
+                    <p class="text-gray-300">Analyzing statements...</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Instructions -->
+        <div class="bg-gray-800 rounded-lg shadow-xl p-8">
+            <h3 class="text-xl font-bold mb-4">Categories</h3>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
+                <div class="bg-gray-700 p-4 rounded-lg">
+                    <h4 class="font-bold text-blue-500 mb-2">DNM</h4>
+                    <p class="text-sm text-gray-400">Statements matching company names in your Excel file</p>
+                </div>
+                <div class="bg-gray-700 p-4 rounded-lg">
+                    <h4 class="font-bold text-green-500 mb-2">NatioSingle</h4>
+                    <p class="text-sm text-gray-400">Single-page US statements (non-DNM)</p>
+                </div>
+                <div class="bg-gray-700 p-4 rounded-lg">
+                    <h4 class="font-bold text-yellow-500 mb-2">NatioMulti</h4>
+                    <p class="text-sm text-gray-400">Multi-page US statements (non-DNM)</p>
+                </div>
+                <div class="bg-gray-700 p-4 rounded-lg">
+                    <h4 class="font-bold text-purple-500 mb-2">Foreign</h4>
+                    <p class="text-sm text-gray-400">International statements (no US state found)</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Review Section -->
+    <div id="reviewSection" class="hidden">
+        <div class="bg-gray-800 rounded-lg shadow-xl p-8">
+            <h2 class="text-xl font-bold mb-6">Review Close Matches</h2>
+            <p class="text-gray-400 mb-6">The system found potential matches that need your confirmation.</p>
+            
+            <div id="reviewCard" class="bg-gray-700 rounded-lg p-6">
+                <div class="mb-4">
+                    <p class="text-sm text-gray-400 mb-1">Statement Company Name:</p>
+                    <p class="text-lg font-bold" id="statementName"></p>
+                </div>
+                <div class="mb-6">
+                    <p class="text-sm text-gray-400 mb-1">Closest Match in Database:</p>
+                    <p class="text-lg font-bold text-green-500" id="closestMatch"></p>
+                </div>
+                <div class="mb-6 text-sm text-gray-400">
+                    <p><span class="font-medium">Page:</span> <span id="pageInfo"></span></p>
+                    <p><span class="font-medium">Total Pages:</span> <span id="totalPages"></span></p>
+                </div>
+                
+                <p class="text-lg mb-4">Is this a DNM company?</p>
+                <div class="flex space-x-4">
+                    <button id="reviewYes" class="flex-1 bg-green-600 hover:bg-green-700 text-white font-bold py-3 px-6 rounded-lg transition duration-300">
+                        <i class="fas fa-check mr-2"></i>Yes, it's DNM
+                    </button>
+                    <button id="reviewNo" class="flex-1 bg-red-600 hover:bg-red-700 text-white font-bold py-3 px-6 rounded-lg transition duration-300">
+                        <i class="fas fa-times mr-2"></i>No, categorize normally
+                    </button>
+                </div>
+            </div>
+            
+            <div class="mt-4 text-center text-gray-400">
+                <p>Review <span id="currentReview">1</span> of <span id="totalReviews">1</span></p>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Elements
+    const uploadForm = document.getElementById('uploadForm');
+    const pdfInput = document.getElementById('pdfInput');
+    const excelInput = document.getElementById('excelInput');
+    const pdfDropZone = document.getElementById('pdfDropZone');
+    const excelDropZone = document.getElementById('excelDropZone');
+    const processBtn = document.getElementById('processBtn');
+    const progress = document.getElementById('progress');
+    const uploadSection = document.getElementById('uploadSection');
+    const reviewSection = document.getElementById('reviewSection');
+    
+    let sessionId = null;
+    let statements = [];
+    let currentIndex = 0;
+
+    // File handling
+    function setupDropZone(dropZone, input, infoDiv, nameDiv, sizeDiv) {
+        dropZone.addEventListener('click', () => input.click());
+        
+        ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(eventName => {
+            dropZone.addEventListener(eventName, (e) => {
+                e.preventDefault();
+                e.stopPropagation();
+            });
+        });
+
+        ['dragenter', 'dragover'].forEach(eventName => {
+            dropZone.addEventListener(eventName, () => {
+                dropZone.classList.add('border-green-500', 'bg-gray-700');
+            });
+        });
+
+        ['dragleave', 'drop'].forEach(eventName => {
+            dropZone.addEventListener(eventName, () => {
+                dropZone.classList.remove('border-green-500', 'bg-gray-700');
+            });
+        });
+
+        dropZone.addEventListener('drop', (e) => {
+            const files = e.dataTransfer.files;
+            if (files.length) {
+                input.files = files;
+                handleFileSelect(input, infoDiv, nameDiv, sizeDiv);
+            }
+        });
+
+        input.addEventListener('change', () => {
+            handleFileSelect(input, infoDiv, nameDiv, sizeDiv);
+        });
+    }
+
+    function handleFileSelect(input, infoDiv, nameDiv, sizeDiv) {
+        const file = input.files[0];
+        if (file) {
+            nameDiv.textContent = file.name;
+            sizeDiv.textContent = formatFileSize(file.size);
+            infoDiv.classList.remove('hidden');
+            checkFilesReady();
+        }
+    }
+
+    function formatFileSize(bytes) {
+        if (bytes === 0) return '0 Bytes';
+        const k = 1024;
+        const sizes = ['Bytes', 'KB', 'MB', 'GB'];
+        const i = Math.floor(Math.log(bytes) / Math.log(k));
+        return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
+    }
+
+    function checkFilesReady() {
+        if (pdfInput.files.length && excelInput.files.length) {
+            processBtn.classList.remove('hidden');
+        }
+    }
+
+    // Setup drop zones
+    setupDropZone(pdfDropZone, pdfInput, 
+        document.getElementById('pdfInfo'),
+        document.getElementById('pdfName'),
+        document.getElementById('pdfSize')
+    );
+    
+    setupDropZone(excelDropZone, excelInput,
+        document.getElementById('excelInfo'),
+        document.getElementById('excelName'),
+        document.getElementById('excelSize')
+    );
+
+    // Form submission
+    uploadForm.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        
+        const formData = new FormData();
+        formData.append('pdf_file', pdfInput.files[0]);
+        formData.append('excel_file', excelInput.files[0]);
+
+        processBtn.disabled = true;
+        progress.classList.remove('hidden');
+
+        try {
+            const response = await fetch('/statement/upload', {
+                method: 'POST',
+                body: formData
+            });
+
+            const data = await response.json();
+
+            if (data.status === 'review') {
+                sessionId = data.session_id;
+                statements = data.statements;
+                currentIndex = 0;
+                showReview();
+            } else if (data.status === 'success') {
+                sessionId = data.session_id;
+                showResults();
+            } else {
+                showError(data.message);
+            }
+        } catch (error) {
+            showError('An error occurred while processing the files.');
+        } finally {
+            progress.classList.add('hidden');
+            processBtn.disabled = false;
+        }
+    });
+
+    // Review handling
+    function showReview() {
+        uploadSection.classList.add('hidden');
+        reviewSection.classList.remove('hidden');
+        displayCurrentStatement();
+    }
+
+    function displayCurrentStatement() {
+        const statement = statements[currentIndex];
+        document.getElementById('statementName').textContent = statement.company_name;
+        document.getElementById('closestMatch').textContent = statement.close_match;
+        document.getElementById('pageInfo').textContent = statement.page_num;
+        document.getElementById('totalPages').textContent = statement.total_pages;
+        document.getElementById('currentReview').textContent = currentIndex + 1;
+        document.getElementById('totalReviews').textContent = statements.length;
+    }
+
+    document.getElementById('reviewYes').addEventListener('click', () => submitReview('yes'));
+    document.getElementById('reviewNo').addEventListener('click', () => submitReview('no'));
+
+    async function submitReview(decision) {
+        try {
+            const response = await fetch('/statement/review', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    session_id: sessionId,
+                    decision: decision,
+                    statement_index: currentIndex
+                })
+            });
+
+            const data = await response.json();
+
+            if (data.status === 'continue') {
+                currentIndex++;
+                displayCurrentStatement();
+            } else if (data.status === 'complete') {
+                showResults();
+            }
+        } catch (error) {
+            showError('An error occurred during review.');
+        }
+    }
+
+    function showResults() {
+        window.location.href = `/statement/results/${sessionId}`;
+    }
+
+    function showError(message) {
+        const errorDiv = document.createElement('div');
+        errorDiv.className = 'fixed top-4 right-4 p-4 bg-red-500 bg-opacity-20 border border-red-500 rounded-lg';
+        errorDiv.innerHTML = `
+            <p class="text-red-500 font-bold">
+                <i class="fas fa-exclamation-circle mr-2"></i>Error
+            </p>
+            <p class="text-gray-300">${message}</p>
+        `;
+        document.body.appendChild(errorDiv);
+        
+        setTimeout(() => errorDiv.remove(), 5000);
+    }
+});
+</script>
+{% endblock %}

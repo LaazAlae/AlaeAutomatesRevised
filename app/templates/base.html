@@ -25,12 +25,26 @@
                         <span class="text-xl font-bold">Automate</span>
                     </a>
                 </div>
-                <div class="flex items-center space-x-4">
+                <div class="hidden md:flex items-center space-x-4">
                     <a href="{{ url_for('invoice_processor.index') }}" class="nav-link">Invoice Processor</a>
                     <a href="{{ url_for('statement_separator.index') }}" class="nav-link">Statement Separator</a>
                     <a href="{{ url_for('excel_macros.index') }}" class="nav-link">Excel Macros</a>
                     <a href="{{ url_for('cc_batch_demo.index') }}" class="nav-link">CC Batch</a>
                 </div>
+                <div class="md:hidden flex items-center">
+                    <button id="mobile-menu-btn" class="text-gray-300 hover:text-white">
+                        <i class="fas fa-bars text-xl"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+        <!-- Mobile menu -->
+        <div id="mobile-menu" class="hidden md:hidden">
+            <div class="px-2 pt-2 pb-3 space-y-1">
+                <a href="{{ url_for('invoice_processor.index') }}" class="block px-3 py-2 rounded-md text-base font-medium text-gray-300 hover:text-white hover:bg-gray-700">Invoice Processor</a>
+                <a href="{{ url_for('statement_separator.index') }}" class="block px-3 py-2 rounded-md text-base font-medium text-gray-300 hover:text-white hover:bg-gray-700">Statement Separator</a>
+                <a href="{{ url_for('excel_macros.index') }}" class="block px-3 py-2 rounded-md text-base font-medium text-gray-300 hover:text-white hover:bg-gray-700">Excel Macros</a>
+                <a href="{{ url_for('cc_batch_demo.index') }}" class="block px-3 py-2 rounded-md text-base font-medium text-gray-300 hover:text-white hover:bg-gray-700">CC Batch</a>
             </div>
         </div>
     </nav>
@@ -43,4 +57,16 @@
     </main>
     
     <!-- Footer -->
-    <footer class="bg-gray-800 py-
+    <footer class="bg-gray-800 py-4 mt-8">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="text-center text-gray-400">
+                <p>&copy; 2024 Automate. Built with Flask & Python.</p>
+            </div>
+        </div>
+    </footer>
+    
+    <!-- Scripts -->
+    <script src="{{ url_for('static', filename='js/main.js') }}"></script>
+    {% block extra_js %}{% endblock %}
+</body>
+</html>
